@@ -16,7 +16,7 @@
             <p>Litigation Prediction Dashboard</p>
         </div>
 
-        <button class="primary-btn">+ New Case Analysis</button>
+        <button class="primary-btn" onclick="openModal()">+ New Case Analysis</button>
     </div>
 
     <!-- Search -->
@@ -66,6 +66,34 @@
     </div>
 
 </div>
+
+<!-- Upload Modal -->
+<div id="caseModal" class="modal">
+    <div class="modal-content">
+        <span class="close" onclick="closeModal()">&times;</span>
+
+        <h2>New Case Analysis</h2>
+        <p>Upload a litigation case file (PDF or DOCX)</p>
+
+        <form action="/upload" method="POST" enctype="multipart/form-data">
+            <input type="file" name="case_file" accept=".pdf,.docx" required />
+            <button type="submit" class="primary-btn full-width">
+                Upload & Analyze
+            </button>
+        </form>
+    </div>
+</div>
+
+<script>
+function openModal() {
+    document.getElementById("caseModal").style.display = "flex";
+}
+
+function closeModal() {
+    document.getElementById("caseModal").style.display = "none";
+}
+</script>
+
 
 </body>
 </html>
