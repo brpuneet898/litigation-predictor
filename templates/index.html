@@ -1,0 +1,71 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8" />
+    <title>1Verdict AI – Litigation Prediction Dashboard</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+</head>
+<body>
+
+<div class="container">
+
+    <!-- Header -->
+    <div class="header">
+        <div class="logo">
+            ⚖️ <span>1Verdict AI</span>
+            <p>Litigation Prediction Dashboard</p>
+        </div>
+
+        <button class="primary-btn">+ New Case Analysis</button>
+    </div>
+
+    <!-- Search -->
+    <div class="search-box">
+        <input type="text" placeholder="Search cases by title, type, or jurisdiction..." />
+    </div>
+
+    <!-- Metrics -->
+    <div class="cards">
+        <div class="card highlight">
+            <h4>AVG WIN PROBABILITY</h4>
+            <h2>0%</h2>
+            <p>0 cases analyzed</p>
+        </div>
+
+        <div class="card">
+            <h4>AVG DURATION</h4>
+            <h2>0</h2>
+            <p>months</p>
+        </div>
+
+        <div class="card">
+            <h4>TOTAL EST. COSTS</h4>
+            <h2>$0K</h2>
+            <p>across all cases</p>
+        </div>
+
+        <div class="card success">
+            <h4>HIGH RISK CASES</h4>
+            <h2>0</h2>
+            <p>no high risk</p>
+        </div>
+    </div>
+
+    <!-- Cases -->
+    <div class="cases">
+        <div class="cases-header">
+            <h3>Your Cases</h3>
+            <span>0 cases</span>
+        </div>
+
+        <div class="empty-state">
+            ⚖️
+            <p>No cases yet. Start by creating your first case analysis.</p>
+            <a href="#">Create Your First Case</a>
+        </div>
+    </div>
+
+</div>
+
+</body>
+</html>
