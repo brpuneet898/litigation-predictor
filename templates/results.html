@@ -1,0 +1,133 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8" />
+    <title>Case Analysis Results – 1Verdict AI</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+</head>
+<body>
+
+<div class="container">
+
+    <!-- Header -->
+    <div class="header">
+        <div class="logo">
+            ⚖️ <span>1Verdict AI</span>
+            <p>Litigation Prediction Dashboard</p>
+        </div>
+        <a href="/" class="secondary-btn">Back to Dashboard</a>
+    </div>
+
+    <!-- Case Summary Card -->
+    <div class="results-summary">
+        <h2>📊 Case Analysis Complete</h2>
+        <div class="summary-grid">
+            <div class="summary-item">
+                <span class="label">Case Type:</span>
+                <span class="value">{{ case_data.case_type }}</span>
+            </div>
+            <div class="summary-item">
+                <span class="label">Jurisdiction:</span>
+                <span class="value">{{ case_data.jurisdiction }}</span>
+            </div>
+            <div class="summary-item">
+                <span class="label">Parties:</span>
+                <span class="value">{{ case_data.parties }}</span>
+            </div>
+            <div class="summary-item">
+                <span class="label">Stage:</span>
+                <span class="value">{{ case_data.stage_of_case }}</span>
+            </div>
+        </div>
+    </div>
+
+    <!-- Analysis Results -->
+    <div class="results-container">
+        
+        <!-- Issues -->
+        <div class="result-section">
+            <h3>🔍 Key Legal Issues</h3>
+            <div class="result-content">
+                {% if analysis.issues and analysis.issues|length > 0 %}
+                    <ul class="result-list">
+                        {% for issue in analysis.issues %}
+                        <li>{{ issue }}</li>
+                        {% endfor %}
+                    </ul>
+                {% else %}
+                    <p class="no-data">No issues identified</p>
+                {% endif %}
+            </div>
+        </div>
+
+        <!-- Claims -->
+        <div class="result-section">
+            <h3>⚖️ Legal Claims</h3>
+            <div class="result-content">
+                {% if analysis.claims and analysis.claims|length > 0 %}
+                    <ul class="result-list">
+                        {% for claim in analysis.claims %}
+                        <li>{{ claim }}</li>
+                        {% endfor %}
+                    </ul>
+                {% else %}
+                    <p class="no-data">No claims identified</p>
+                {% endif %}
+            </div>
+        </div>
+
+        <!-- Defenses -->
+        <div class="result-section">
+            <h3>🛡️ Potential Defenses</h3>
+            <div class="result-content">
+                {% if analysis.defenses and analysis.defenses|length > 0 %}
+                    <ul class="result-list">
+                        {% for defense in analysis.defenses %}
+                        <li>{{ defense }}</li>
+                        {% endfor %}
+                    </ul>
+                {% else %}
+                    <p class="no-data">No defenses identified</p>
+                {% endif %}
+            </div>
+        </div>
+
+        <!-- Monetary Value -->
+        <div class="result-section highlight-section">
+            <h3>💰 Monetary Value</h3>
+            <div class="result-content">
+                {% if analysis.monetary_value %}
+                    <p class="monetary-value">{{ analysis.monetary_value }}</p>
+                {% else %}
+                    <p class="no-data">Not specified</p>
+                {% endif %}
+            </div>
+        </div>
+
+        <!-- Urgency Flags -->
+        <div class="result-section alert-section">
+            <h3>⚠️ Urgency Flags</h3>
+            <div class="result-content">
+                {% if analysis.urgency_flags and analysis.urgency_flags|length > 0 %}
+                    <ul class="result-list urgency-list">
+                        {% for flag in analysis.urgency_flags %}
+                        <li>{{ flag }}</li>
+                        {% endfor %}
+                    </ul>
+                {% else %}
+                    <p class="no-data">No urgent matters</p>
+                {% endif %}
+            </div>
+        </div>
+
+    </div>
+
+    <!-- Actions -->
+    <div class="results-actions">
+        <a href="/" class="primary-btn">Analyze Another Case</a>
+    </div>
+
+</div>
+
+</body>
+</html>

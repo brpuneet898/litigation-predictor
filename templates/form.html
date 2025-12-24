@@ -1,0 +1,109 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8" />
+    <title>Case Details Form – 1Verdict AI</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+</head>
+<body>
+
+<div class="container">
+
+    <!-- Header -->
+    <div class="header">
+        <div class="logo">
+            ⚖️ <span>1Verdict AI</span>
+            <p>Litigation Prediction Dashboard</p>
+        </div>
+        <a href="/" class="secondary-btn">Back to Dashboard</a>
+    </div>
+
+    <!-- Form Section -->
+    <div class="form-container">
+        <h2>📋 Case Information</h2>
+        <p class="form-subtitle">Review and edit the extracted information from your document</p>
+
+        <form action="/analyze" method="POST">
+            
+            <div class="form-group">
+                <label for="case_type">Case Type</label>
+                <input 
+                    type="text" 
+                    name="case_type" 
+                    id="case_type" 
+                    placeholder="e.g., Commercial civil suit, Criminal, Arbitration"
+                    value="{{ fields.case_type }}"
+                    required
+                />
+            </div>
+
+            <div class="form-group">
+                <label for="jurisdiction">Jurisdiction (Court + City)</label>
+                <input 
+                    type="text" 
+                    name="jurisdiction" 
+                    id="jurisdiction" 
+                    placeholder="e.g., Supreme Court, New Delhi"
+                    value="{{ fields.jurisdiction }}"
+                    required
+                />
+            </div>
+
+            <div class="form-group">
+                <label for="parties">Parties (Plaintiff / Defendant)</label>
+                <input 
+                    type="text" 
+                    name="parties" 
+                    id="parties" 
+                    placeholder="e.g., John Doe vs. ABC Corporation"
+                    value="{{ fields.parties }}"
+                    required
+                />
+            </div>
+
+            <div class="form-group">
+                <label for="short_facts">Short Facts</label>
+                <textarea 
+                    name="short_facts" 
+                    id="short_facts" 
+                    rows="5"
+                    placeholder="Brief summary of the case facts..."
+                    required
+                >{{ fields.short_facts }}</textarea>
+            </div>
+
+            <div class="form-group">
+                <label for="relief_sought">Relief Sought</label>
+                <input 
+                    type="text" 
+                    name="relief_sought" 
+                    id="relief_sought" 
+                    placeholder="e.g., Damages, Injunction, etc."
+                    value="{{ fields.relief_sought }}"
+                    required
+                />
+            </div>
+
+            <div class="form-group">
+                <label for="stage_of_case">Stage of Case</label>
+                <select name="stage_of_case" id="stage_of_case" required>
+                    <option value="">Select Stage</option>
+                    <option value="Pre-filing" {% if fields.stage_of_case == 'Pre-filing' %}selected{% endif %}>Pre-filing</option>
+                    <option value="Trial" {% if fields.stage_of_case == 'Trial' %}selected{% endif %}>Trial</option>
+                    <option value="Appeal" {% if fields.stage_of_case == 'Appeal' %}selected{% endif %}>Appeal</option>
+                </select>
+            </div>
+
+            <div class="form-actions">
+                <button type="submit" class="primary-btn full-width">
+                    🔍 Proceed with Analysis
+                </button>
+            </div>
+
+        </form>
+    </div>
+
+</div>
+
+</body>
+</html>
