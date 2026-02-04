@@ -11,99 +11,505 @@
 
     <!-- Header -->
     <div class="header">
-        <div class="logo">
-            ⚖️ <span>1Verdict AI</span>
-            <p>Litigation Prediction Dashboard</p>
-        </div>
-        <a href="/" class="secondary-btn">Back to Dashboard</a>
+        <a href="/" class="secondary-btn">← Back to Dashboard</a>
     </div>
 
     <!-- Form Section -->
     <div class="form-container">
-        <h2>📋 Case Information</h2>
-        <p class="form-subtitle">Review and edit the extracted information from your document</p>
+        <h1 class="text-3xl font-bold text-slate-800 mb-2">New Case Analysis</h1>
+        <p class="form-subtitle">Provide case details to generate AI-powered litigation predictions</p>
 
-        <form action="/analyze" method="POST">
+        <!-- Optional File Upload -->
+        <div class="file-upload-section" style="margin-bottom: 2rem; padding: 1.5rem; background: #f8f9fa; border-radius: 8px; border: 2px dashed #dee2e6;">
+            <h3 style="margin-top: 0; font-size: 1.1rem;">Upload Document</h3>
+            <p style="color: #6c757d; font-size: 0.9rem; margin-bottom: 1rem;">Upload a PDF or DOCX file to auto-extract case information</p>
+            <form action="/upload" method="POST" enctype="multipart/form-data" style="margin: 0;">
+                <div style="display: flex; gap: 1rem; align-items: center;">
+                    <input type="file" name="case_file" id="case_file" accept=".pdf,.docx" style="flex: 1;" />
+                    <button type="submit" id="uploadBtn" class="secondary-btn" disabled style="opacity: 0.5; cursor: not-allowed;">Upload & Extract</button>
+                </div>
+            </form>
+        </div>
+
+        <script>
+        // Enable/disable upload button based on file selection
+        document.getElementById('case_file').addEventListener('change', function() {
+            const uploadBtn = document.getElementById('uploadBtn');
+            if (this.files && this.files.length > 0) {
+                uploadBtn.disabled = false;
+                uploadBtn.style.opacity = '1';
+                uploadBtn.style.cursor = 'pointer';
+            } else {
+                uploadBtn.disabled = true;
+                uploadBtn.style.opacity = '0.5';
+                uploadBtn.style.cursor = 'not-allowed';
+            }
+        });
+        </script>
+
+        <!-- Manual Entry Form -->
+        <form id="caseAnalysisForm" action="/analyze" method="POST">
             
             <div class="form-group">
-                <label for="case_type">Case Type</label>
+                <label for="case_title">Case Title *</label>
                 <input 
                     type="text" 
-                    name="case_type" 
-                    id="case_type" 
-                    placeholder="e.g., Commercial civil suit, Criminal, Arbitration"
-                    value="{{ fields.case_type }}"
+                    name="case_title" 
+                    id="case_title" 
+                    placeholder="e.g., Smith vs. Johnson Corporation"
+                    value="{{ fields.case_title }}"
                     required
                 />
             </div>
 
-            <div class="form-group">
-                <label for="jurisdiction">Jurisdiction (Court + City)</label>
-                <input 
-                    type="text" 
-                    name="jurisdiction" 
-                    id="jurisdiction" 
-                    placeholder="e.g., Supreme Court, New Delhi"
-                    value="{{ fields.jurisdiction }}"
-                    required
-                />
+            <div class="form-row">
+                <div class="form-group">
+                    <label for="case_type">Case Type *</label>
+                    <div class="custom-select-wrapper">
+                        <div class="custom-select" id="customCaseTypeSelect">
+                            <div class="custom-select-trigger">
+                                <span>{{ fields.case_type if fields.case_type else 'Select Case Type' }}</span>
+                                <div class="arrow">▼</div>
+                            </div>
+                            <div class="custom-options">
+                                <div class="custom-option" data-value="">Select Case Type</div>
+                                <div class="custom-option" data-value="Abuses and threatening">Abuses and threatening</div>
+                                <div class="custom-option" data-value="Adoption">Adoption</div>
+                                <div class="custom-option" data-value="ADMIRALTY SUITS">ADMIRALTY SUITS</div>
+                                <div class="custom-option" data-value="Anticipatory Bail">Anticipatory Bail</div>
+                                <div class="custom-option" data-value="Appeal against the Judgment and Order of conviction">Appeal against the Judgment and Order of conviction</div>
+                                <div class="custom-option" data-value="Application by a tenant for fixation of standard rent">Application by a tenant for fixation of standard rent</div>
+                                <div class="custom-option" data-value="Application for damages before the Motor Accidents Claims Tribunal">Application for damages before the Motor Accidents Claims Tribunal</div>
+                                <div class="custom-option" data-value="Application for temporary injunction">Application for temporary injunction</div>
+                                <div class="custom-option" data-value="Application U/S 340 Perjury">Application U/S 340 Perjury</div>
+                                <div class="custom-option" data-value="Application u/s 156 (Direction to register FIR)">Application u/s 156 (Direction to register FIR)</div>
+                                <div class="custom-option" data-value="Arbitration Application">Arbitration Application</div>
+                                <div class="custom-option" data-value="Arbitration Petition">Arbitration Petition</div>
+                                <div class="custom-option" data-value="Bail before a magistrate">Bail before a magistrate</div>
+                                <div class="custom-option" data-value="Bigamous marriage">Bigamous marriage</div>
+                                <div class="custom-option" data-value="Cancellation of Bail">Cancellation of Bail</div>
+                                <div class="custom-option" data-value="Caveat">Caveat</div>
+                                <div class="custom-option" data-value="Cheating">Cheating</div>
+                                <div class="custom-option" data-value="Civil revision Application">Civil revision Application</div>
+                                <div class="custom-option" data-value="Civil suit (compensation)">Civil suit (compensation)</div>
+                                <div class="custom-option" data-value="Civil suit (injunction)">Civil suit (injunction)</div>
+                                <div class="custom-option" data-value="Civil suit (posession)">Civil suit (posession)</div>
+                                <div class="custom-option" data-value="Civil Suit (recovery)">Civil Suit (recovery)</div>
+                                <div class="custom-option" data-value="Commercial Admiralty Suit">Commercial Admiralty Suit</div>
+                                <div class="custom-option" data-value="Commercial Arbitration Petition">Commercial Arbitration Petition</div>
+                                <div class="custom-option" data-value="Commercial Execution Application">Commercial Execution Application</div>
+                                <div class="custom-option" data-value="Commercial Intellectual property Rights suit">Commercial Intellectual property Rights suit</div>
+                                <div class="custom-option" data-value="Commercial Suit">Commercial Suit</div>
+                                <div class="custom-option" data-value="Commercial SUMMARY SUITS">Commercial SUMMARY SUITS</div>
+                                <div class="custom-option" data-value="Complaint under Sec 138 of NI Act">Complaint under Sec 138 of NI Act</div>
+                                <div class="custom-option" data-value="Conjugal Rights">Conjugal Rights</div>
+                                <div class="custom-option" data-value="COUNTER CLAIM">COUNTER CLAIM</div>
+                                <div class="custom-option" data-value="Criminal complaint">Criminal complaint</div>
+                                <div class="custom-option" data-value="Criminal Revision Application">Criminal Revision Application</div>
+                                <div class="custom-option" data-value="Criminal tresspass">Criminal tresspass</div>
+                                <div class="custom-option" data-value="Damages against a Doctor for negligent act">Damages against a Doctor for negligent act</div>
+                                <div class="custom-option" data-value="Damages for defamation">Damages for defamation</div>
+                                <div class="custom-option" data-value="Defamation">Defamation</div>
+                                <div class="custom-option" data-value="Dissolution of partnership and rendition of accounts">Dissolution of partnership and rendition of accounts</div>
+                                <div class="custom-option" data-value="Divorce">Divorce</div>
+                                <div class="custom-option" data-value="Divorce by mutual consent">Divorce by mutual consent</div>
+                                <div class="custom-option" data-value="Domestic violence">Domestic violence</div>
+                                <div class="custom-option" data-value="Execution Application">Execution Application</div>
+                                <div class="custom-option" data-value="Execution of maintenance order already passed in favour of wife">Execution of maintenance order already passed in favour of wife</div>
+                                <div class="custom-option" data-value="Execution petition (Darkhast) on the basis of a decree of Civil Court">Execution petition (Darkhast) on the basis of a decree of Civil Court</div>
+                                <div class="custom-option" data-value="First Appeal/ Civil Appeal">First Appeal/ Civil Appeal</div>
+                                <div class="custom-option" data-value="For posession by a landlord against the tenant under the Rent Control Act">For posession by a landlord against the tenant under the Rent Control Act</div>
+                                <div class="custom-option" data-value="Garnishee Notice">Garnishee Notice</div>
+                                <div class="custom-option" data-value="Heirship Certificate">Heirship Certificate</div>
+                                <div class="custom-option" data-value="Hurt">Hurt</div>
+                                <div class="custom-option" data-value="Judicial separation">Judicial separation</div>
+                                <div class="custom-option" data-value="Maintenance Application">Maintenance Application</div>
+                                <div class="custom-option" data-value="Mandatory Injunction">Mandatory Injunction</div>
+                                <div class="custom-option" data-value="Marriage petition">Marriage petition</div>
+                                <div class="custom-option" data-value="Memo of revision application against the order of maintenance">Memo of revision application against the order of maintenance</div>
+                                <div class="custom-option" data-value="Mesne profits">Mesne profits</div>
+                                <div class="custom-option" data-value="Motor Accident Claim petition">Motor Accident Claim petition</div>
+                                <div class="custom-option" data-value="PARSI SUITS">PARSI SUITS</div>
+                                <div class="custom-option" data-value="Partition in a Hindu joint family">Partition in a Hindu joint family</div>
+                                <div class="custom-option" data-value="Permanent Injunction">Permanent Injunction</div>
+                                <div class="custom-option" data-value="Plain maintenance application">Plain maintenance application</div>
+                                <div class="custom-option" data-value="Probate on the basis of Will">Probate on the basis of Will</div>
+                                <div class="custom-option" data-value="Recovery of amount ordered">Recovery of amount ordered</div>
+                                <div class="custom-option" data-value="Recovery of money for price of goods sold or work done">Recovery of money for price of goods sold or work done</div>
+                                <div class="custom-option" data-value="Recovery of money on the basis of a promissory note">Recovery of money on the basis of a promissory note</div>
+                                <div class="custom-option" data-value="Return of property Application">Return of property Application</div>
+                                <div class="custom-option" data-value="Review Application">Review Application</div>
+                                <div class="custom-option" data-value="Setting aside a decree obtained by fraud">Setting aside a decree obtained by fraud</div>
+                                <div class="custom-option" data-value="Specific performance of contract or damages">Specific performance of contract or damages</div>
+                                <div class="custom-option" data-value="Succession certificate">Succession certificate</div>
+                                <div class="custom-option" data-value="Summary Suit">Summary Suit</div>
+                                <div class="custom-option" data-value="Wrongful dismissal against the Government">Wrongful dismissal against the Government</div>
+                            </div>
+                        </div>
+                        <input type="hidden" name="case_type" id="case_type" value="{{ fields.case_type }}" required>
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <label for="jurisdiction">Jurisdiction *</label>
+                    <div class="custom-select-wrapper">
+                        <div class="custom-select" id="customJurisdictionSelect">
+                            <div class="custom-select-trigger">
+                                <span>{{ fields.jurisdiction if fields.jurisdiction else 'Select Jurisdiction' }}</span>
+                                <div class="arrow">▼</div>
+                            </div>
+                            <div class="custom-options">
+                                <div class="custom-option" data-value="">Select Jurisdiction</div>
+                                <div class="custom-option" data-value="Ahmednagar">Ahmednagar</div>
+                                <div class="custom-option" data-value="Akola">Akola</div>
+                                <div class="custom-option" data-value="Amravati">Amravati</div>
+                                <div class="custom-option" data-value="Aurangabad">Aurangabad</div>
+                                <div class="custom-option" data-value="Beed">Beed</div>
+                                <div class="custom-option" data-value="Bhandara">Bhandara</div>
+                                <div class="custom-option" data-value="Buldhana">Buldhana</div>
+                                <div class="custom-option" data-value="Chandrapur">Chandrapur</div>
+                                <div class="custom-option" data-value="Dhule">Dhule</div>
+                                <div class="custom-option" data-value="Gadchiroli">Gadchiroli</div>
+                                <div class="custom-option" data-value="Gondia">Gondia</div>
+                                <div class="custom-option" data-value="Jalgaon">Jalgaon</div>
+                                <div class="custom-option" data-value="Jalna">Jalna</div>
+                                <div class="custom-option" data-value="Jamkhed">Jamkhed</div>
+                                <div class="custom-option" data-value="Karjat">Karjat</div>
+                                <div class="custom-option" data-value="Kolhapur">Kolhapur</div>
+                                <div class="custom-option" data-value="Kopergaon">Kopergaon</div>
+                                <div class="custom-option" data-value="Latur">Latur</div>
+                                <div class="custom-option" data-value="Maharashtra Family Courts">Maharashtra Family Courts</div>
+                                <div class="custom-option" data-value="Maharashtra Industrial and Lab">Maharashtra Industrial and Lab</div>
+                                <div class="custom-option" data-value="Maharashtra School Tribunals">Maharashtra School Tribunals</div>
+                                <div class="custom-option" data-value="Mah State Cooperative Appellat">Mah State Cooperative Appellat</div>
+                                <div class="custom-option" data-value="Mumbai City Civil Court">Mumbai City Civil Court</div>
+                                <div class="custom-option" data-value="Mumbai CMM Courts">Mumbai CMM Courts</div>
+                                <div class="custom-option" data-value="Mumbai Motor Accident Claims T">Mumbai Motor Accident Claims T</div>
+                                <div class="custom-option" data-value="Mumbai Small Causes Court">Mumbai Small Causes Court</div>
+                                <div class="custom-option" data-value="Nagpur">Nagpur</div>
+                                <div class="custom-option" data-value="Nanded">Nanded</div>
+                                <div class="custom-option" data-value="Nandurbar">Nandurbar</div>
+                                <div class="custom-option" data-value="Nashik">Nashik</div>
+                                <div class="custom-option" data-value="Newasa">Newasa</div>
+                                <div class="custom-option" data-value="Osmanabad">Osmanabad</div>
+                                <div class="custom-option" data-value="Parbhani">Parbhani</div>
+                                <div class="custom-option" data-value="Parner">Parner</div>
+                                <div class="custom-option" data-value="Pathardi">Pathardi</div>
+                                <div class="custom-option" data-value="Pune">Pune</div>
+                                <div class="custom-option" data-value="Rahata">Rahata</div>
+                                <div class="custom-option" data-value="Rahuri">Rahuri</div>
+                                <div class="custom-option" data-value="Raigad">Raigad</div>
+                                <div class="custom-option" data-value="Ratnagiri">Ratnagiri</div>
+                                <div class="custom-option" data-value="Sangli">Sangli</div>
+                                <div class="custom-option" data-value="Sangamner">Sangamner</div>
+                                <div class="custom-option" data-value="Satara">Satara</div>
+                                <div class="custom-option" data-value="Shevgaon">Shevgaon</div>
+                                <div class="custom-option" data-value="Shrirampur">Shrirampur</div>
+                                <div class="custom-option" data-value="Shrigonda">Shrigonda</div>
+                                <div class="custom-option" data-value="Sindhudurg">Sindhudurg</div>
+                                <div class="custom-option" data-value="Solapur">Solapur</div>
+                                <div class="custom-option" data-value="Thane">Thane</div>
+                                <div class="custom-option" data-value="Wardha">Wardha</div>
+                                <div class="custom-option" data-value="Washim">Washim</div>
+                                <div class="custom-option" data-value="Yavatmal">Yavatmal</div>
+                            </div>
+                        </div>
+                        <input type="hidden" name="jurisdiction" id="jurisdiction" value="{{ fields.jurisdiction }}" required>
+                    </div>
+                </div>
+            </div>
+
+            <div class="form-row">
+                <div class="form-group">
+                    <label for="court_level">Court Level</label>
+                    <div class="custom-select-wrapper">
+                        <div class="custom-select" id="customCourtLevelSelect">
+                            <div class="custom-select-trigger">
+                                <span>{{ fields.court_level if fields.court_level else 'Select Court Level' }}</span>
+                                <div class="arrow">▼</div>
+                            </div>
+                            <div class="custom-options">
+                                <div class="custom-option" data-value="">Select Court Level</div>
+                                <div class="custom-option" data-value="Supreme Court">Supreme Court</div>
+                                <div class="custom-option" data-value="High Court">High Court</div>
+                                <div class="custom-option" data-value="District and Sessions Court">District and Sessions Court</div>
+                                <div class="custom-option" data-value="Sessions Court">Sessions Court</div>
+                                <div class="custom-option" data-value="Additional Sessions Court">Additional Sessions Court</div>
+                                <div class="custom-option" data-value="Chief Judicial Magistrate">Chief Judicial Magistrate</div>
+                                <div class="custom-option" data-value="Metropolitan Magistrate Court">Metropolitan Magistrate Court</div>
+                                <div class="custom-option" data-value="Civil Court Senior Division">Civil Court Senior Division</div>
+                                <div class="custom-option" data-value="Civil Court Junior Division">Civil Court Junior Division</div>
+                                <div class="custom-option" data-value="Family Court">Family Court</div>
+                                <div class="custom-option" data-value="Small Causes Court">Small Causes Court</div>
+                                <div class="custom-option" data-value="Consumer Court">Consumer Court</div>
+                                <div class="custom-option" data-value="Labour Court">Labour Court</div>
+                                <div class="custom-option" data-value="Motor Accident Claims Tribunal">Motor Accident Claims Tribunal</div>
+                                <div class="custom-option" data-value="Special Court">Special Court</div>
+                                <div class="custom-option" data-value="Tribunal">Tribunal</div>
+                            </div>
+                        </div>
+                        <input type="hidden" name="court_level" id="court_level" value="{{ fields.court_level }}">
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <label for="claim_amount">Claim Amount ($)</label>
+                    <input 
+                        type="number" 
+                        name="claim_amount" 
+                        id="claim_amount" 
+                        placeholder="e.g., 50000"
+                        value="{{ fields.claim_amount }}"
+                        step="0.01"
+                        min="0"
+                    />
+                </div>
+            </div>
+
+            <div class="form-row">
+                <div class="form-group">
+                    <label for="opponent_counsel">Opponent Counsel</label>
+                    <input 
+                        type="text" 
+                        name="opponent_counsel" 
+                        id="opponent_counsel" 
+                        placeholder="e.g., Law Firm Name or Attorney Name"
+                        value="{{ fields.opponent_counsel }}"
+                    />
+                </div>
+
+                <div class="form-group">
+                    <label for="opponent_profile">Opponent Profile</label>
+                    <input 
+                        type="text" 
+                        name="opponent_profile" 
+                        id="opponent_profile" 
+                        placeholder="e.g., Corporation, Individual, Government Entity"
+                        value="{{ fields.opponent_profile }}"
+                    />
+                </div>
             </div>
 
             <div class="form-group">
-                <label for="parties">Parties (Plaintiff / Defendant)</label>
-                <input 
-                    type="text" 
-                    name="parties" 
-                    id="parties" 
-                    placeholder="e.g., John Doe vs. ABC Corporation"
-                    value="{{ fields.parties }}"
-                    required
-                />
-            </div>
-
-            <div class="form-group">
-                <label for="short_facts">Short Facts</label>
+                <label for="key_legal_issues">Key Legal Issues</label>
                 <textarea 
-                    name="short_facts" 
-                    id="short_facts" 
-                    rows="5"
-                    placeholder="Brief summary of the case facts..."
-                    required
-                >{{ fields.short_facts }}</textarea>
-            </div>
-
-            <div class="form-group">
-                <label for="relief_sought">Relief Sought</label>
-                <input 
-                    type="text" 
-                    name="relief_sought" 
-                    id="relief_sought" 
-                    placeholder="e.g., Damages, Injunction, etc."
-                    value="{{ fields.relief_sought }}"
-                    required
-                />
-            </div>
-
-            <div class="form-group">
-                <label for="stage_of_case">Stage of Case</label>
-                <select name="stage_of_case" id="stage_of_case" required>
-                    <option value="">Select Stage</option>
-                    <option value="Pre-filing" {% if fields.stage_of_case == 'Pre-filing' %}selected{% endif %}>Pre-filing</option>
-                    <option value="Trial" {% if fields.stage_of_case == 'Trial' %}selected{% endif %}>Trial</option>
-                    <option value="Appeal" {% if fields.stage_of_case == 'Appeal' %}selected{% endif %}>Appeal</option>
-                </select>
-            </div>
-
-            <div class="form-actions">
-                <button type="submit" class="primary-btn full-width">
-                    🔍 Proceed with Analysis
-                </button>
+                    name="key_legal_issues" 
+                    id="key_legal_issues" 
+                    rows="4"
+                    placeholder="Describe the main legal issues or questions in this case..."
+                >{{ fields.key_legal_issues }}</textarea>
             </div>
 
         </form>
     </div>
 
+    <!-- Document Upload Section -->
+    <div class="form-container" style="margin-top: 30px;">
+        <h2 style="margin-bottom: 10px;">Document Upload</h2>
+        <p style="color: #666; margin-bottom: 30px;">Upload relevant documents to improve prediction accuracy</p>
+
+        <div class="upload-boxes-container">
+            <div class="upload-box" onclick="document.getElementById('pleadingInput').click()">
+                <svg class="upload-icon" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path>
+                    <polyline points="17 8 12 3 7 8"></polyline>
+                    <line x1="12" y1="3" x2="12" y2="15"></line>
+                </svg>
+                <span class="upload-label">Pleading</span>
+            </div>
+
+            <div class="upload-box" onclick="document.getElementById('contractsInput').click()">
+                <svg class="upload-icon" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path>
+                    <polyline points="17 8 12 3 7 8"></polyline>
+                    <line x1="12" y1="3" x2="12" y2="15"></line>
+                </svg>
+                <span class="upload-label">Contracts</span>
+            </div>
+
+            <div class="upload-box" onclick="document.getElementById('judgementsInput').click()">
+                <svg class="upload-icon" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path>
+                    <polyline points="17 8 12 3 7 8"></polyline>
+                    <line x1="12" y1="3" x2="12" y2="15"></line>
+                </svg>
+                <span class="upload-label">Judgements</span>
+            </div>
+        </div>
+
+        <!-- Hidden file inputs -->
+        <input 
+            type="file" 
+            id="pleadingInput" 
+            accept=".pdf,.docx" 
+            multiple 
+            style="display: none;"
+            onchange="handleFileSelect('pleading', this.files)"
+        />
+        <input 
+            type="file" 
+            id="contractsInput" 
+            accept=".pdf,.docx" 
+            multiple 
+            style="display: none;"
+            onchange="handleFileSelect('contracts', this.files)"
+        />
+        <input 
+            type="file" 
+            id="judgementsInput" 
+            accept=".pdf,.docx" 
+            multiple 
+            style="display: none;"
+            onchange="handleFileSelect('judgements', this.files)"
+        />
+
+        <!-- Uploaded Files List -->
+        <div id="uploadedFilesList" class="uploaded-files-list"></div>
+    </div>
+
+    <!-- Proceed with Analysis Button -->
+    <div style="margin-top: 30px; text-align: center;">
+        <button type="submit" form="caseAnalysisForm" class="primary-btn" style="padding: 14px 32px;">
+        Generate Predictions
+        </button>
+    </div>
+
 </div>
+
+<script>
+// Custom dropdown functionality
+document.addEventListener('DOMContentLoaded', function() {
+    // Function to initialize custom dropdown
+    function initCustomDropdown(selectId, inputId) {
+        const customSelect = document.getElementById(selectId);
+        const trigger = customSelect.querySelector('.custom-select-trigger');
+        const options = customSelect.querySelectorAll('.custom-option');
+        const hiddenInput = document.getElementById(inputId);
+        const triggerText = trigger.querySelector('span');
+        
+        // Toggle dropdown
+        trigger.addEventListener('click', function(e) {
+            e.stopPropagation();
+            // Close other dropdowns
+            document.querySelectorAll('.custom-select.open').forEach(sel => {
+                if (sel !== customSelect) {
+                    sel.classList.remove('open');
+                }
+            });
+            customSelect.classList.toggle('open');
+        });
+        
+        // Select option
+        options.forEach(option => {
+            option.addEventListener('click', function(e) {
+                e.stopPropagation();
+                const value = this.getAttribute('data-value');
+                const text = this.textContent;
+                
+                // Update hidden input
+                hiddenInput.value = value;
+                
+                // Update trigger text
+                triggerText.textContent = text;
+                
+                // Update selected class
+                options.forEach(opt => opt.classList.remove('selected'));
+                this.classList.add('selected');
+                
+                // Close dropdown
+                customSelect.classList.remove('open');
+            });
+        });
+        
+        // Set initial selected option if value exists
+        const currentValue = hiddenInput.value;
+        if (currentValue) {
+            options.forEach(option => {
+                if (option.getAttribute('data-value') === currentValue) {
+                    option.classList.add('selected');
+                }
+            });
+        }
+    }
+    
+    // Initialize all three dropdowns
+    initCustomDropdown('customCaseTypeSelect', 'case_type');
+    initCustomDropdown('customJurisdictionSelect', 'jurisdiction');
+    initCustomDropdown('customCourtLevelSelect', 'court_level');
+    
+    // Close all dropdowns when clicking outside
+    document.addEventListener('click', function(e) {
+        if (!e.target.closest('.custom-select')) {
+            document.querySelectorAll('.custom-select.open').forEach(sel => {
+                sel.classList.remove('open');
+            });
+        }
+    });
+});
+
+// Document Upload Functionality
+let uploadedFiles = [];
+
+function handleFileSelect(category, files) {
+    const fileArray = Array.from(files);
+    
+    fileArray.forEach(file => {
+        // Check if file already exists
+        const exists = uploadedFiles.some(f => f.name === file.name && f.category === category);
+        if (!exists) {
+            uploadedFiles.push({
+                file: file,
+                category: category,
+                id: Date.now() + Math.random()
+            });
+        }
+    });
+    
+    renderUploadedFiles();
+    
+    // Reset file input
+    if (category === 'pleading') document.getElementById('pleadingInput').value = '';
+    if (category === 'contracts') document.getElementById('contractsInput').value = '';
+    if (category === 'judgements') document.getElementById('judgementsInput').value = '';
+}
+
+function removeFile(fileId) {
+    uploadedFiles = uploadedFiles.filter(f => f.id !== fileId);
+    renderUploadedFiles();
+}
+
+function renderUploadedFiles() {
+    const container = document.getElementById('uploadedFilesList');
+    
+    if (uploadedFiles.length === 0) {
+        container.innerHTML = '';
+        return;
+    }
+    
+    let html = '<div style="margin-top: 30px;"><h3 style="margin-bottom: 15px; font-size: 16px;">Uploaded Files</h3>';
+    
+    uploadedFiles.forEach(item => {
+        html += `
+            <div class="file-card">
+                <div class="file-info">
+                    <span class="file-name">${item.file.name}</span>
+                </div>
+                <button type="button" class="delete-file-btn" onclick="removeFile(${item.id})">
+                    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <polyline points="3 6 5 6 21 6"></polyline>
+                        <path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path>
+                        <line x1="10" y1="11" x2="10" y2="17"></line>
+                        <line x1="14" y1="11" x2="14" y2="17"></line>
+                    </svg>
+                </button>
+            </div>
+        `;
+    });
+    
+    html += '</div>';
+    container.innerHTML = html;
+}
+</script>
 
 </body>
 </html>

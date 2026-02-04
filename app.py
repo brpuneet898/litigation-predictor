@@ -31,35 +31,52 @@ os.makedirs(DATA_DIR, exist_ok=True)
 FIELD_EXTRACTION_PROMPT = """You are a legal AI assistant analyzing litigation documents. 
 Carefully read the document and extract the following information:
 
-1. **case_type**: The type/category of the case (e.g., "Commercial civil suit", "Criminal prosecution", "Civil contract dispute", "Arbitration", etc.). Be specific and accurate based on the document.
+1. **case_title**: Brief title/name of the case (e.g., "Ram Kumar vs State of Maharashtra")
 
-2. **jurisdiction**: The court name and city (e.g., "Supreme Court, Delhi")
+2. **case_type**: MUST select ONLY ONE from this exact list:
+["Abuses and threatening", "Adoption", "ADMIRALTY SUITS", "Anticipatory Bail", "Appeal against the Judgment and Order of conviction", "Application by a tenant for fixation of standard rent", "Application for damages before the Motor Accidents Claims Tribunal", "Application for temporary injunction", "Application U/S 340 Perjury", "Application u/s 156 (Direction to register FIR)", "Arbitration Application", "Arbitration Petition", "Bail before a magistrate", "Bigamous marriage", "Cancellation of Bail", "Caveat", "Cheating", "Civil revision Application", "Civil suit (compensation)", "Civil suit (injunction)", "Civil suit (posession)", "Civil Suit (recovery)", "Commercial Admiralty Suit", "Commercial Arbitration Petition", "Commercial Execution Application", "Commercial Intellectual property Rights suit", "Commercial Suit", "Commercial SUMMARY SUITS", "Complaint under Sec 138 of NI Act", "Conjugal Rights", "COUNTER CLAIM", "Criminal complaint", "Criminal Revision Application", "Criminal tresspass", "Damages against a Doctor for negligent act", "Damages for defamation", "Defamation", "Dissolution of partnership and rendition of accounts", "Divorce", "Divorce by mutual consent", "Domestic violence", "Execution Application", "Execution of maintenance order already passed in favour of wife", "Execution petition (Darkhast) on the basis of a decree of Civil Court", "First Appeal/ Civil Appeal", "For posession by a landlord against the tenant under the Rent Control Act", "Garnishee Notice", "Heirship Certificate", "Hurt", "Judicial separation", "Maintenance Application", "Mandatory Injunction", "Marriage petition", "Memo of revision application against the order of maintenance", "Mesne profits", "Motor Accident Claim petition", "PARSI SUITS", "Partition in a Hindu joint family", "Permanent Injunction", "Plain maintenance application", "Probate on the basis of Will", "Recovery of amount ordered", "Recovery of money for price of goods sold or work done", "Recovery of money on the basis of a promissory note", "Return of property Application", "Review Application", "Setting aside a decree obtained by fraud", "Specific performance of contract or damages", "Succession certificate", "Summary Suit", "Wrongful dismissal against the Government"]
+If document doesn't match any option exactly, choose the closest match.
 
-3. **parties**: Names of plaintiff/petitioner and defendant/respondent
+3. **jurisdiction**: MUST select ONLY ONE from this exact list:
+["Ahmednagar", "Akola", "Amravati", "Aurangabad", "Beed", "Bhandara", "Buldhana", "Chandrapur", "Dhule", "Gadchiroli", "Gondia", "Jalgaon", "Jalna", "Jamkhed", "Karjat", "Kolhapur", "Kopergaon", "Latur", "Maharashtra Family Courts", "Maharashtra Industrial and Lab", "Maharashtra School Tribunals", "Mah State Cooperative Appellat", "Mumbai City Civil Court", "Mumbai CMM Courts", "Mumbai Motor Accident Claims T", "Mumbai Small Causes Court", "Nagpur", "Nanded", "Nandurbar", "Nashik", "Newasa", "Osmanabad", "Parbhani", "Parner", "Pathardi", "Pune", "Rahata", "Rahuri", "Raigad", "Ratnagiri", "Sangli", "Sangamner", "Satara", "Shevgaon", "Shrirampur", "Shrigonda", "Sindhudurg", "Solapur", "Thane", "Wardha", "Washim", "Yavatmal"]
+Select the city/court location mentioned in the document.
 
-4. **short_facts**: A 2-3 sentence summary of what happened. ALWAYS provide this - summarize the key events, dispute, or allegations from the document.
+4. **court_level**: MUST select ONLY ONE from this exact list:
+["Supreme Court", "High Court", "District and Sessions Court", "Sessions Court", "Additional Sessions Court", "Chief Judicial Magistrate", "Metropolitan Magistrate Court", "Civil Court Senior Division", "Civil Court Junior Division", "Family Court", "Small Causes Court", "Consumer Court", "Labour Court", "Motor Accident Claims Tribunal", "Special Court", "Tribunal"]
+Select based on the court hierarchy mentioned in the document.
 
-5. **relief_sought**: What the plaintiff is asking for (damages, injunction, specific performance, etc.)
+5. **claim_amount**: Numeric value of claim/damages amount in currency. Extract ONLY the number (e.g., "500000" or "0" if not mentioned).
 
-6. **stage_of_case**: Must be EXACTLY one of: "Pre-filing", "Trial", or "Appeal"
-   - If document is a draft, consultation, or pre-litigation → "Pre-filing"
-   - If case is ongoing in court, evidence stage → "Trial"
-   - If challenging a lower court decision → "Appeal"
+6. **opponent_counsel**: Name of the opposing party's lawyer/advocate. Look for:
+   - "Advocate for respondent/defendant"
+   - "Counsel appearing for the other side"
+   - Lawyer names mentioned alongside the opposing party
+   - Leave empty ONLY if no advocate/lawyer name is found
+
+7. **opponent_profile**: Brief description of opponent party (company/individual, their role, background). Include:
+   - Party name (respondent/defendant)
+   - Whether individual, company, or government entity
+   - Their position/status in the case
+
+8. **key_legal_issues**: 2-3 sentence summary of the main legal questions/issues that need to be resolved
 
 Return ONLY a valid JSON object with these exact keys:
 {
+  "case_title": "",
   "case_type": "",
   "jurisdiction": "",
-  "parties": "",
-  "short_facts": "",
-  "relief_sought": "",
-  "stage_of_case": ""
+  "court_level": "",
+  "claim_amount": "0",
+  "opponent_counsel": "",
+  "opponent_profile": "",
+  "key_legal_issues": ""
 }
 
 IMPORTANT:
-- Use EXACT capitalization for case_type and stage_of_case as shown above
-- ALWAYS try to provide short_facts - even a brief summary is better than empty
-- Only leave fields empty if truly no information is available
+- For case_type, jurisdiction, and court_level: MUST use EXACT text from the lists provided
+- For claim_amount: provide number only, default to "0" if not found
+- ALWAYS try to extract key_legal_issues - even a brief summary is better than empty
+- Only leave fields empty if truly no information is available in the document
 - Do not include any explanatory text, only the JSON object."""
 
 ANALYSIS_PROMPT = """You are an expert legal AI assistant analyzing a litigation case.
@@ -134,7 +151,21 @@ def create_vector_embeddings(text, session_id):
     index_path = os.path.join(DATA_DIR, f"{session_id}_faiss.index")
     faiss.write_index(index, index_path)
     
+    # Save chunks to disk as JSON (don't store in session - too large for cookies)
+    chunks_path = os.path.join(DATA_DIR, f"{session_id}_chunks.json")
+    with open(chunks_path, 'w', encoding='utf-8') as f:
+        json.dump(chunks, f, ensure_ascii=False)
+    
     return index_path, chunks
+
+
+def load_chunks_from_disk(session_id):
+    """Load text chunks from disk"""
+    chunks_path = os.path.join(DATA_DIR, f"{session_id}_chunks.json")
+    if os.path.exists(chunks_path):
+        with open(chunks_path, 'r', encoding='utf-8') as f:
+            return json.load(f)
+    return []
 
 
 def retrieve_context(session_id, chunks, top_k=5):
@@ -205,49 +236,56 @@ def upload_case():
     # Create vector embeddings
     index_path, chunks = create_vector_embeddings(text, session_id)
     
-    # Store chunks and text in session
-    session['document_chunks'] = chunks
-    session['document_text'] = text[:5000]  # Store first 5000 chars for context
-    
-    # Get context for LLM
-    context = retrieve_context(session_id, chunks, top_k=10)
+    # Get context for LLM (increased to 20 chunks for better coverage)
+    context = retrieve_context(session_id, chunks, top_k=20)
     
     # Call LLM to extract fields
     llm_response = call_llm(FIELD_EXTRACTION_PROMPT, context)
     
+    # Debug: Print LLM response
+    print("=" * 80)
+    print("LLM EXTRACTION RESPONSE:")
+    print(llm_response)
+    print("=" * 80)
+    
     # Parse LLM response
-    try:
-        # Extract JSON from response (in case LLM adds extra text)
-        response_text = llm_response.strip()
-        if '```json' in response_text:
-            response_text = response_text.split('```json')[1].split('```')[0]
-        elif '```' in response_text:
-            response_text = response_text.split('```')[1].split('```')[0]
-        
-        extracted_fields = json.loads(response_text.strip())
-        
-        # Normalize stage_of_case values to match dropdown
-        stage_mapping = {
-            'pre-filing': 'Pre-filing',
-            'prefiling': 'Pre-filing',
-            'trial': 'Trial',
-            'appeal': 'Appeal'
-        }
-        if extracted_fields.get('stage_of_case'):
-            normalized = extracted_fields['stage_of_case'].lower().strip().replace(' ', '-')
-            extracted_fields['stage_of_case'] = stage_mapping.get(normalized, extracted_fields['stage_of_case'])
+    if llm_response:
+        try:
+            # Extract JSON from response (in case LLM adds extra text)
+            response_text = llm_response.strip()
+            if '```json' in response_text:
+                response_text = response_text.split('```json')[1].split('```')[0]
+            elif '```' in response_text:
+                response_text = response_text.split('```')[1].split('```')[0]
             
-    except Exception as e:
-        print(f"Error parsing LLM response: {e}")
-        print(f"Raw response: {llm_response}")
-        # If parsing fails, use empty fields
+            extracted_fields = json.loads(response_text.strip())
+                
+        except Exception as e:
+            print(f"Error parsing LLM response: {e}")
+            print(f"Raw response: {llm_response}")
+            # If parsing fails, use empty fields
+            extracted_fields = {
+                "case_title": "",
+                "case_type": "",
+                "jurisdiction": "",
+                "court_level": "",
+                "claim_amount": "0",
+                "opponent_counsel": "",
+                "opponent_profile": "",
+                "key_legal_issues": ""
+            }
+    else:
+        print("LLM call failed - no response received")
+        # If LLM call fails, use empty fields
         extracted_fields = {
+            "case_title": "",
             "case_type": "",
             "jurisdiction": "",
-            "parties": "",
-            "short_facts": "",
-            "relief_sought": "",
-            "stage_of_case": ""
+            "court_level": "",
+            "claim_amount": "0",
+            "opponent_counsel": "",
+            "opponent_profile": "",
+            "key_legal_issues": ""
         }
     
     # Store extracted fields in session
@@ -257,6 +295,23 @@ def upload_case():
     shutil.rmtree(temp_dir)
     
     return redirect(url_for("case_form"))
+
+
+@app.route("/form")
+def new_case_form():
+    """Route for creating a new case with optional file upload"""
+    # Initialize empty fields for manual entry
+    empty_fields = {
+        "case_title": "",
+        "case_type": "",
+        "jurisdiction": "",
+        "court_level": "",
+        "claim_amount": "",
+        "opponent_counsel": "",
+        "opponent_profile": "",
+        "key_legal_issues": ""
+    }
+    return render_template("form.html", fields=empty_fields)
 
 
 @app.route("/case-form")
@@ -270,34 +325,53 @@ def case_form():
 
 @app.route("/analyze", methods=["POST"])
 def analyze_case():
-    if 'document_chunks' not in session:
-        return redirect(url_for("index"))
-    
     # Get form data (user can edit the fields)
     case_data = {
+        "case_title": request.form.get("case_title", ""),
         "case_type": request.form.get("case_type", ""),
         "jurisdiction": request.form.get("jurisdiction", ""),
-        "parties": request.form.get("parties", ""),
-        "short_facts": request.form.get("short_facts", ""),
-        "relief_sought": request.form.get("relief_sought", ""),
-        "stage_of_case": request.form.get("stage_of_case", "")
+        "court_level": request.form.get("court_level", ""),
+        "claim_amount": request.form.get("claim_amount", ""),
+        "opponent_counsel": request.form.get("opponent_counsel", ""),
+        "opponent_profile": request.form.get("opponent_profile", ""),
+        "key_legal_issues": request.form.get("key_legal_issues", "")
     }
     
-    # Prepare context for second LLM call
-    session_id = session['session_id']
-    chunks = session['document_chunks']
-    context = retrieve_context(session_id, chunks, top_k=15)
+    # Check if document was uploaded
+    has_document = 'session_id' in session
+    
+    if has_document:
+        # Prepare context for second LLM call with document
+        session_id = session['session_id']
+        chunks = load_chunks_from_disk(session_id)
+        if chunks:
+            context = retrieve_context(session_id, chunks, top_k=15)
+        else:
+            has_document = False
+            context = ""
+    else:
+        # Manual entry without document - use case data as context
+        context = f"""Case Title: {case_data['case_title']}
+Case Type: {case_data['case_type']}
+Jurisdiction: {case_data['jurisdiction']}
+Court Level: {case_data['court_level']}
+Claim Amount: {case_data['claim_amount']}
+Opponent Counsel: {case_data['opponent_counsel']}
+Opponent Profile: {case_data['opponent_profile']}
+Key Legal Issues: {case_data['key_legal_issues']}"""
     
     # Combine case data with context
     full_context = f"""Case Information:
+Case Title: {case_data['case_title']}
 Case Type: {case_data['case_type']}
 Jurisdiction: {case_data['jurisdiction']}
-Parties: {case_data['parties']}
-Short Facts: {case_data['short_facts']}
-Relief Sought: {case_data['relief_sought']}
-Stage of Case: {case_data['stage_of_case']}
+Court Level: {case_data['court_level']}
+Claim Amount: {case_data['claim_amount']}
+Opponent Counsel: {case_data['opponent_counsel']}
+Opponent Profile: {case_data['opponent_profile']}
+Key Legal Issues: {case_data['key_legal_issues']}
 
-Document Content:
+{"Document Content:" if has_document else "Additional Context:"}
 {context}
 """
     

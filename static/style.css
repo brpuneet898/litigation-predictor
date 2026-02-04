@@ -198,8 +198,8 @@ body {
     background: white;
     border-radius: 12px;
     border: 1px solid #e5e7eb;
-    padding: 40px;
-    max-width: 800px;
+    padding: 32px 32px;
+    max-width: 960px;
     margin: 0 auto;
 }
 
@@ -214,8 +214,19 @@ body {
     font-size: 14px;
 }
 
+.form-row {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 20px;
+    margin-bottom: 25px;
+}
+
 .form-group {
     margin-bottom: 25px;
+}
+
+.form-row .form-group {
+    margin-bottom: 0;
 }
 
 .form-group label {
@@ -236,6 +247,109 @@ body {
     font-size: 14px;
     font-family: Inter, Arial, sans-serif;
     transition: border-color 0.2s;
+}
+
+.form-group select {
+    cursor: pointer;
+}
+
+/* Custom Dropdown Styles */
+.custom-select-wrapper {
+    position: relative;
+}
+
+.custom-select {
+    position: relative;
+    width: 100%;
+}
+
+.custom-select-trigger {
+    position: relative;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 12px 14px;
+    border: 1px solid #d1d5db;
+    border-radius: 8px;
+    background: white;
+    cursor: pointer;
+    font-size: 14px;
+    font-family: Inter, Arial, sans-serif;
+    transition: border-color 0.2s;
+}
+
+.custom-select-trigger:hover {
+    border-color: #9ca3af;
+}
+
+.custom-select.open .custom-select-trigger {
+    border-color: #2563eb;
+    box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.1);
+}
+
+.custom-select-trigger .arrow {
+    font-size: 10px;
+    transition: transform 0.2s;
+    color: #6b7280;
+}
+
+.custom-select.open .custom-select-trigger .arrow {
+    transform: rotate(180deg);
+}
+
+.custom-options {
+    position: absolute;
+    display: none;
+    top: 100%;
+    left: 0;
+    right: 0;
+    border: 1px solid #d1d5db;
+    border-radius: 8px;
+    background: white;
+    margin-top: 4px;
+    max-height: 250px;
+    overflow-y: auto;
+    z-index: 100;
+    box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+}
+
+.custom-select.open .custom-options {
+    display: block;
+}
+
+.custom-option {
+    padding: 10px 14px;
+    cursor: pointer;
+    font-size: 14px;
+    transition: background-color 0.15s;
+}
+
+.custom-option:hover {
+    background-color: #f3f4f6;
+}
+
+.custom-option.selected {
+    background-color: #eff6ff;
+    color: #2563eb;
+    font-weight: 500;
+}
+
+.custom-options::-webkit-scrollbar {
+    width: 8px;
+}
+
+.custom-options::-webkit-scrollbar-track {
+    background: #f1f1f1;
+    border-radius: 8px;
+}
+
+.custom-options::-webkit-scrollbar-thumb {
+    background: #d1d5db;
+    border-radius: 8px;
+}
+
+.custom-options::-webkit-scrollbar-thumb:hover {
+    background: #9ca3af;
 }
 
 .form-group input:focus,
@@ -395,5 +509,112 @@ body {
 @media (max-width: 480px) {
     .cards {
         grid-template-columns: 1fr;
+    }
+}
+
+/* Document Upload Section */
+.upload-boxes-container {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 20px;
+    margin-bottom: 20px;
+}
+
+.upload-box {
+    border: 2px dashed #d1d5db;
+    border-radius: 12px;
+    padding: 18px 24px;
+    text-align: center;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    background: #f9fafb;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 12px;
+}
+
+.upload-box:hover {
+    border-color: #2563eb;
+    background: #eff6ff;
+    transform: translateY(-2px);
+}
+
+.upload-icon {
+    color: #6b7280;
+    flex-shrink: 0;
+    transition: color 0.3s ease;
+}
+
+.upload-box:hover .upload-icon {
+    color: #2563eb;
+}
+
+.upload-label {
+    font-size: 16px;
+    font-weight: 600;
+    color: #374151;
+}
+
+.uploaded-files-list {
+    margin-top: 20px;
+}
+
+.file-card {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 14px 18px;
+    background: white;
+    border: 1px solid #e5e7eb;
+    border-radius: 8px;
+    margin-bottom: 10px;
+    transition: all 0.2s ease;
+}
+
+.file-card:hover {
+    border-color: #2563eb;
+    box-shadow: 0 2px 8px rgba(37, 99, 235, 0.1);
+}
+
+.file-info {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    flex: 1;
+}
+
+.file-name {
+    font-size: 14px;
+    color: #374151;
+    font-weight: 500;
+    flex: 1;
+}
+
+.delete-file-btn {
+    background: none;
+    border: none;
+    color: #dc2626;
+    cursor: pointer;
+    padding: 6px;
+    border-radius: 4px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: all 0.2s ease;
+}
+
+.delete-file-btn:hover {
+    background: #fef2f2;
+}
+
+@media (max-width: 768px) {
+    .upload-boxes-container {
+        grid-template-columns: 1fr;
+        gap: 15px;
+    }
+    
+    .upload-box {
+        padding: 30px 20px;
     }
 }
