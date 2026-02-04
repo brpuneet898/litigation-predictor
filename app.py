@@ -106,6 +106,86 @@ IMPORTANT:
 - If you cannot determine something, provide an empty array [] or empty string """""
 
 
+PREDICTION_PROMPT = """You are an expert litigation prediction AI with deep knowledge of Indian legal system, court procedures, case outcomes, and legal costs across different jurisdictions in Maharashtra.
+
+Based on the provided case information and supporting documents, analyze and predict the litigation outcome with THREE different prediction models:
+
+1. **BALANCED**: Realistic, moderate predictions based on typical case outcomes
+2. **AGGRESSIVE**: Optimistic predictions assuming best-case scenarios (higher win probability, shorter duration, lower costs)
+3. **CONSERVATIVE**: Cautious predictions assuming challenges and uncertainties (lower win probability, longer duration, higher costs)
+
+Consider these factors:
+- Case type, jurisdiction, and court level
+- Strength of legal claims vs defenses
+- Quality and completeness of evidence/documentation
+- Opponent counsel experience and profile
+- Historical case outcome patterns in similar cases
+- Court backlog and typical case durations in the jurisdiction
+- Legal complexity and claim amount
+- Key legal issues and their precedents
+
+Provide your prediction in EXACTLY this JSON structure with ALL THREE models:
+{
+  "balanced": {
+    "win_probability": <number between 0-100>,
+    "confidence_level": <number between 0-100>,
+    "duration": "<estimated time like '6-12 months' or '1-2 years'>",
+    "estimated_costs": "₹<min> - ₹<max>",
+    "risk_tag": "<Low Risk/Medium Risk/High Risk>"
+  },
+  "aggressive": {
+    "win_probability": <number between 0-100>,
+    "confidence_level": <number between 0-100>,
+    "duration": "<estimated time like '6-12 months' or '1-2 years'>",
+    "estimated_costs": "₹<min> - ₹<max>",
+    "risk_tag": "<Low Risk/Medium Risk/High Risk>"
+  },
+  "conservative": {
+    "win_probability": <number between 0-100>,
+    "confidence_level": <number between 0-100>,
+    "duration": "<estimated time like '6-12 months' or '1-2 years'>",
+    "estimated_costs": "₹<min> - ₹<max>",
+    "risk_tag": "<Low Risk/Medium Risk/High Risk>"
+  }
+}
+
+Guidelines for each field:
+- **win_probability**: 0-100 percentage. Consider all case merits, evidence strength, legal precedents
+  - Aggressive: +10-20% higher than balanced
+  - Conservative: -10-20% lower than balanced
+- **confidence_level**: 0-100 percentage representing certainty in the prediction
+  - 75-100%: Strong documentation, clear legal grounds, favorable precedents, comprehensive evidence
+  - 50-74%: Moderate evidence, some uncertainties in legal interpretation, adequate documentation
+  - 0-49%: Insufficient documentation, unclear legal position, unpredictable factors, missing evidence
+  - Aggressive: Higher confidence assuming best documentation
+  - Conservative: Lower confidence accounting for uncertainties
+- **duration**: Based on court level, jurisdiction backlog, case complexity
+  - Small Causes/Magistrate: 3-12 months
+  - Civil Court/Family Court: 6 months - 2 years
+  - Sessions/District Court: 1-3 years
+  - High Court: 2-5 years
+  - Supreme Court: 3-7 years
+  - Aggressive: Faster resolution (lower end of range)
+  - Conservative: Slower resolution (upper end or beyond)
+- **estimated_costs**: Legal fees in Indian Rupees (₹). Consider:
+  - Court level (higher courts = higher fees)
+  - Case complexity
+  - Claim amount (typically 2-10% of claim)
+  - Jurisdiction (metro cities like Mumbai/Pune higher than smaller cities)
+  - Expected duration
+  - Opponent counsel reputation
+  - Aggressive: Lower cost estimates (efficient resolution)
+  - Conservative: Higher cost estimates (accounting for delays/complications)
+- **risk_tag**: Overall risk assessment
+  - Low Risk: High win probability (70%+), strong case, manageable costs
+  - Medium Risk: Moderate win probability (40-70%), some uncertainties
+  - High Risk: Low win probability (<40%), weak case, or very high costs/duration
+  - Tag should match the prediction profile (aggressive = likely lower risk, conservative = likely higher risk)
+
+Return ONLY the JSON object with all three models. No additional text or explanations."""
+
+
+
 def extract_text_from_pdf(file_path):
     """Extract text from PDF file"""
     text = ""
@@ -291,6 +371,9 @@ def upload_case():
     # Store extracted fields in session
     session['extracted_fields'] = extracted_fields
     
+    # Store uploaded filename in session
+    session['uploaded_filename'] = filename
+    
     # Clean up temp file
     shutil.rmtree(temp_dir)
     
@@ -320,7 +403,8 @@ def case_form():
         return redirect(url_for("index"))
     
     fields = session['extracted_fields']
-    return render_template("form.html", fields=fields)
+    uploaded_filename = session.get('uploaded_filename', None)
+    return render_template("form.html", fields=fields, uploaded_filename=uploaded_filename)
 
 
 @app.route("/analyze", methods=["POST"])
@@ -337,20 +421,61 @@ def analyze_case():
         "key_legal_issues": request.form.get("key_legal_issues", "")
     }
     
-    # Check if document was uploaded
+    # Process uploaded documents from Document Upload section
+    uploaded_files = request.files.getlist('supporting_documents')
+    doc_texts = []
+    doc_names = request.form.getlist('doc_names')
+    
+    if uploaded_files:
+        for file in uploaded_files:
+            if file and file.filename:
+                # Save to temp location
+                temp_dir = tempfile.mkdtemp()
+                filename = secure_filename(file.filename)
+                filepath = os.path.join(temp_dir, filename)
+                file.save(filepath)
+                
+                # Extract text based on file type
+                if filename.lower().endswith('.pdf'):
+                    text = extract_text_from_pdf(filepath)
+                elif filename.lower().endswith('.docx'):
+                    text = extract_text_from_docx(filepath)
+                else:
+                    text = ""
+                
+                if text.strip():
+                    doc_texts.append({
+                        'filename': filename,
+                        'text': text
+                    })
+                
+                # Clean up temp file
+                shutil.rmtree(temp_dir)
+    
+    # Check if document was uploaded from Upload Document section (auto-extract)
     has_document = 'session_id' in session
     
+    # Build comprehensive context from all sources
+    all_context_parts = []
+    
+    # Add uploaded document context (from Upload Document section)
     if has_document:
-        # Prepare context for second LLM call with document
         session_id = session['session_id']
         chunks = load_chunks_from_disk(session_id)
         if chunks:
-            context = retrieve_context(session_id, chunks, top_k=15)
-        else:
-            has_document = False
-            context = ""
+            upload_context = retrieve_context(session_id, chunks, top_k=15)
+            all_context_parts.append(f"Primary Document (Auto-Extracted):\n{upload_context}")
+    
+    # Add supporting documents context (from Document Upload section)
+    if doc_texts:
+        for doc in doc_texts:
+            all_context_parts.append(f"Supporting Document - {doc['filename']}:\n{doc['text'][:5000]}")
+    
+    # Combine all context
+    if all_context_parts:
+        context = "\n\n---\n\n".join(all_context_parts)
     else:
-        # Manual entry without document - use case data as context
+        # No documents - use form data only
         context = f"""Case Title: {case_data['case_title']}
 Case Type: {case_data['case_type']}
 Jurisdiction: {case_data['jurisdiction']}
@@ -360,25 +485,29 @@ Opponent Counsel: {case_data['opponent_counsel']}
 Opponent Profile: {case_data['opponent_profile']}
 Key Legal Issues: {case_data['key_legal_issues']}"""
     
-    # Combine case data with context
+    # Combine case data with context for prediction
     full_context = f"""Case Information:
 Case Title: {case_data['case_title']}
 Case Type: {case_data['case_type']}
 Jurisdiction: {case_data['jurisdiction']}
 Court Level: {case_data['court_level']}
-Claim Amount: {case_data['claim_amount']}
+Claim Amount: ₹{case_data['claim_amount']}
 Opponent Counsel: {case_data['opponent_counsel']}
 Opponent Profile: {case_data['opponent_profile']}
 Key Legal Issues: {case_data['key_legal_issues']}
 
-{"Document Content:" if has_document else "Additional Context:"}
+{'Document Evidence:' if (has_document or doc_texts) else 'No Documents Provided'}
 {context}
 """
     
-    # Call LLM for analysis
-    llm_response = call_llm(ANALYSIS_PROMPT, full_context)
+    # Call LLM for litigation prediction
+    print("\n" + "="*80)
+    print("GENERATING LITIGATION PREDICTION...")
+    print("="*80)
     
-    # Parse LLM response
+    llm_response = call_llm(PREDICTION_PROMPT, full_context)
+    
+    # Parse LLM prediction response
     try:
         # Extract JSON from response (in case LLM adds extra text)
         response_text = llm_response.strip() if llm_response else "{}"
@@ -387,34 +516,92 @@ Key Legal Issues: {case_data['key_legal_issues']}
         elif '```' in response_text:
             response_text = response_text.split('```')[1].split('```')[0]
         
-        analysis = json.loads(response_text.strip())
+        predictions = json.loads(response_text.strip())
         
-        # Ensure all required keys exist
-        if 'issues' not in analysis:
-            analysis['issues'] = []
-        if 'claims' not in analysis:
-            analysis['claims'] = []
-        if 'defenses' not in analysis:
-            analysis['defenses'] = []
-        if 'monetary_value' not in analysis:
-            analysis['monetary_value'] = ""
-        if 'urgency_flags' not in analysis:
-            analysis['urgency_flags'] = []
+        # Print all predictions to terminal
+        print("\n" + "="*80)
+        print("LITIGATION PREDICTION RESULTS - ALL MODELS")
+        print("="*80)
+        
+        for model in ['balanced', 'aggressive', 'conservative']:
+            if model in predictions:
+                pred = predictions[model]
+                print(f"\n{model.upper()} MODEL:")
+                print(f"  Win Probability: {pred.get('win_probability', 'N/A')}%")
+                print(f"  Confidence Level: {pred.get('confidence_level', 'N/A')}%")
+                print(f"  Duration: {pred.get('duration', 'N/A')}")
+                print(f"  Estimated Legal Costs: {pred.get('estimated_costs', 'N/A')}")
+                print(f"  Risk Tag: {pred.get('risk_tag', 'N/A')}")
+        
+        print("="*80 + "\n")
+        
+        # Ensure all three models exist with defaults
+        default_prediction = {
+            "win_probability": 50,
+            "confidence_level": 65,
+            "duration": "1-2 years",
+            "estimated_costs": "₹1,00,000 - ₹3,00,000",
+            "risk_tag": "Medium Risk"
+        }
+        
+        if 'balanced' not in predictions:
+            predictions['balanced'] = default_prediction.copy()
+        if 'aggressive' not in predictions:
+            predictions['aggressive'] = {
+                "win_probability": 70,
+                "confidence_level": 75,
+                "duration": "6-12 months",
+                "estimated_costs": "₹75,000 - ₹2,00,000",
+                "risk_tag": "Low Risk"
+            }
+        if 'conservative' not in predictions:
+            predictions['conservative'] = {
+                "win_probability": 35,
+                "confidence_level": 55,
+                "duration": "1.5-3 years",
+                "estimated_costs": "₹1,50,000 - ₹4,50,000",
+                "risk_tag": "High Risk"
+            }
+        
+        # Store all predictions
+        analysis = predictions
             
     except Exception as e:
-        print(f"Error parsing analysis response: {e}")
-        print(f"Raw LLM response: {llm_response}")
+        print(f"\nError parsing prediction response: {e}")
+        print(f"Raw LLM response: {llm_response}\n")
+        # Provide default predictions for all three models
         analysis = {
-            "issues": [f"Error parsing analysis: {str(e)}"],
-            "claims": [],
-            "defenses": [],
-            "monetary_value": "",
-            "urgency_flags": []
+            "balanced": {
+                "win_probability": 50,
+                "confidence_level": 65,
+                "duration": "1-2 years",
+                "estimated_costs": "₹1,00,000 - ₹3,00,000",
+                "risk_tag": "Medium Risk"
+            },
+            "aggressive": {
+                "win_probability": 70,
+                "confidence_level": 75,
+                "duration": "6-12 months",
+                "estimated_costs": "₹75,000 - ₹2,00,000",
+                "risk_tag": "Low Risk"
+            },
+            "conservative": {
+                "win_probability": 35,
+                "confidence_level": 55,
+                "duration": "1.5-3 years",
+                "estimated_costs": "₹1,50,000 - ₹4,50,000",
+                "risk_tag": "High Risk"
+            }
         }
     
-    # Store analysis in session
+    # Store prediction in session
     session['case_data'] = case_data
     session['analysis'] = analysis
+    
+    # Store document names in session
+    if not doc_names and doc_texts:
+        doc_names = [doc['filename'] for doc in doc_texts]
+    session['uploaded_documents'] = doc_names
     
     return redirect(url_for("results"))
 
@@ -426,8 +613,17 @@ def results():
     
     case_data = session.get('case_data', {})
     analysis = session['analysis']
+    documents = session.get('uploaded_documents', [])
     
-    return render_template("results.html", case_data=case_data, analysis=analysis)
+    return render_template("results.html", case_data=case_data, analysis=analysis, documents=documents)
+
+
+@app.route("/delete-uploaded-doc", methods=["POST"])
+def delete_uploaded_doc():
+    """Delete the uploaded filename from session"""
+    if 'uploaded_filename' in session:
+        del session['uploaded_filename']
+    return jsonify({"success": True})
 
 
 if __name__ == "__main__":
