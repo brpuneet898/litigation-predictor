@@ -203,6 +203,162 @@
 
     </div>
 
+    <!-- Estimated Timeline Section -->
+    <div class="form-container" style="margin-top: 30px;">
+        
+        <!-- Header -->
+        <div style="display: flex; align-items: center; gap: 10px; margin-bottom: 32px;">
+            <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#9ca3af" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <rect width="18" height="18" x="3" y="4" rx="2" ry="2"></rect>
+                <line x1="16" x2="16" y1="2" y2="6"></line>
+                <line x1="8" x2="8" y1="2" y2="6"></line>
+                <line x1="3" x2="21" y1="10" y2="10"></line>
+            </svg>
+            <h2 style="margin: 0; font-size: 22px; color: #1f2937;">Estimated Timeline</h2>
+        </div>
+
+        <!-- Timeline Container -->
+        <div style="position: relative; padding: 0 2%;">
+            
+            <!-- Timeline Line -->
+            <div style="position: absolute; top: 8px; left: 2%; right: 2%; height: 3px; background: #3b82f6;"></div>
+            
+            <!-- Timeline Stages -->
+            <div style="display: flex; justify-content: space-between; position: relative;">
+                
+                <!-- Stage 1: Filing -->
+                <div style="text-align: center; position: relative; padding-top: 20px;">
+                    <!-- Flag Icon -->
+                    <div style="position: absolute; top: 20px; left: 50%; transform: translateX(-50%); margin-bottom: 0;">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#9ca3af" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="margin: 0 auto; display: block;">
+                            <path d="M4 15s1-1 4-1 5 2 8 2 4-1 4-1V3s-1 1-4 1-5-2-8-2-4 1-4 1z"></path>
+                            <line x1="4" x2="4" y1="22" y2="15"></line>
+                        </svg>
+                    </div>
+                    <!-- Dot on Line -->
+                    <div style="position: absolute; top: 1px; left: 50%; transform: translateX(-50%); width: 16px; height: 16px; background: #3b82f6; border: 3px solid #ffffff; border-radius: 50%; box-shadow: 0 2px 8px rgba(59, 130, 246, 0.4); z-index: 2;"></div>
+                    <!-- Stage Name -->
+                    <div style="font-weight: 600; color: #1f2937; font-size: 14px; margin-bottom: 4px; padding-top: 25px;">Filing</div>
+                    <!-- Timeline -->
+                    <div style="color: #6b7280; font-size: 13px;">Now</div>
+                </div>
+                
+                <!-- Stage 2: Discovery -->
+                <div style="text-align: center; position: relative; padding-top: 20px;">
+                    <!-- Flag Icon -->
+                    <div style="position: absolute; top: 20px; left: 50%; transform: translateX(-50%); margin-bottom: 0;">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#9ca3af" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="margin: 0 auto; display: block;">
+                            <path d="M4 15s1-1 4-1 5 2 8 2 4-1 4-1V3s-1 1-4 1-5-2-8-2-4 1-4 1z"></path>
+                            <line x1="4" x2="4" y1="22" y2="15"></line>
+                        </svg>
+                    </div>
+                    <!-- Dot on Line -->
+                    <div style="position: absolute; top: 1px; left: 50%; transform: translateX(-50%); width: 16px; height: 16px; background: #3b82f6; border: 3px solid #ffffff; border-radius: 50%; box-shadow: 0 2px 8px rgba(59, 130, 246, 0.4); z-index: 2;"></div>
+                    <!-- Stage Name -->
+                    <div style="font-weight: 600; color: #1f2937; font-size: 14px; margin-bottom: 4px; padding-top: 25px;">Discovery</div>
+                    <!-- Timeline -->
+                    <div id="discoveryTimeline" style="color: #6b7280; font-size: 13px;"></div>
+                </div>
+                
+                <!-- Stage 3: Mediation -->
+                <div style="text-align: center; position: relative; padding-top: 20px;">
+                    <!-- Flag Icon -->
+                    <div style="position: absolute; top: 20px; left: 50%; transform: translateX(-50%); margin-bottom: 0;">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#9ca3af" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="margin: 0 auto; display: block;">
+                            <path d="M4 15s1-1 4-1 5 2 8 2 4-1 4-1V3s-1 1-4 1-5-2-8-2-4 1-4 1z"></path>
+                            <line x1="4" x2="4" y1="22" y2="15"></line>
+                        </svg>
+                    </div>
+                    <!-- Dot on Line -->
+                    <div style="position: absolute; top: 1px; left: 50%; transform: translateX(-50%); width: 16px; height: 16px; background: #3b82f6; border: 3px solid #ffffff; border-radius: 50%; box-shadow: 0 2px 8px rgba(59, 130, 246, 0.4); z-index: 2;"></div>
+                    <!-- Stage Name -->
+                    <div style="font-weight: 600; color: #1f2937; font-size: 14px; margin-bottom: 4px; padding-top: 25px;">Mediation</div>
+                    <!-- Timeline -->
+                    <div id="mediationTimeline" style="color: #6b7280; font-size: 13px;"></div>
+                </div>
+                
+                <!-- Stage 4: Trial/Settlement -->
+                <div style="text-align: center; position: relative; padding-top: 20px;">
+                    <!-- Flag Icon -->
+                    <div style="position: absolute; top: 20px; left: 50%; transform: translateX(-50%); margin-bottom: 0;">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#9ca3af" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="margin: 0 auto; display: block;">
+                            <path d="M4 15s1-1 4-1 5 2 8 2 4-1 4-1V3s-1 1-4 1-5-2-8-2-4 1-4 1z"></path>
+                            <line x1="4" x2="4" y1="22" y2="15"></line>
+                        </svg>
+                    </div>
+                    <!-- Dot on Line -->
+                    <div style="position: absolute; top: 1px; left: 50%; transform: translateX(-50%); width: 16px; height: 16px; background: #3b82f6; border: 3px solid #ffffff; border-radius: 50%; box-shadow: 0 2px 8px rgba(59, 130, 246, 0.4); z-index: 2;"></div>
+                    <!-- Stage Name -->
+                    <div style="font-weight: 600; color: #1f2937; font-size: 14px; margin-bottom: 4px; padding-top: 25px;">Trial/Settlement</div>
+                    <!-- Timeline -->
+                    <div id="trialTimeline" style="color: #6b7280; font-size: 13px;"></div>
+                </div>
+                
+            </div>
+        </div>
+
+        <!-- Total Duration -->
+        <div style="margin-top: 24px; padding-top: 20px; border-top: 2px solid #e5e7eb;">
+            <p style="color: #4b5563; font-size: 14px; margin: 0;">
+                Total estimated duration: <strong id="totalDuration" style="color: #1f2937; font-size: 16px;"></strong>
+            </p>
+        </div>
+
+    </div>
+
+    <!-- Two Column Section: Why This Prediction & Supporting Precedents -->
+    <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 30px; margin-top: 30px; max-width: 1140px; margin-left: auto; margin-right: auto;">
+        
+        <!-- Left Container: Why This Prediction -->
+        <div class="form-container" style="margin: 0;">
+            <!-- Header -->
+            <div style="display: flex; align-items: center; gap: 10px; margin-bottom: 8px;">
+                <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#9ca3af" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                    <path d="M12 5a3 3 0 1 0-5.997.125 4 4 0 0 0-2.526 5.77 4 4 0 0 0 .556 6.588A4 4 0 1 0 12 18Z"></path>
+                    <path d="M12 5a3 3 0 1 1 5.997.125 4 4 0 0 1 2.526 5.77 4 4 0 0 1-.556 6.588A4 4 0 1 1 12 18Z"></path>
+                    <path d="M15 13a4.5 4.5 0 0 1-3-4 4.5 4.5 0 0 1-3 4"></path>
+                    <path d="M17.599 6.5a3 3 0 0 0 .399-1.375"></path>
+                    <path d="M6.003 5.125A3 3 0 0 0 6.401 6.5"></path>
+                    <path d="M3.477 10.896a4 4 0 0 1 .585-.396"></path>
+                    <path d="M19.938 10.5a4 4 0 0 1 .585.396"></path>
+                    <path d="M6 18a4 4 0 0 1-1.967-.516"></path>
+                    <path d="M19.967 17.484A4 4 0 0 1 18 18"></path>
+                </svg>
+                <h2 style="margin: 0; font-size: 24px; color: #1f2937;">Why This Prediction?</h2>
+            </div>
+            
+            <p style="color: #6b7280; font-size: 14px; margin: 0 0 24px 0;">Key factors influencing the outcome</p>
+            
+            <!-- Factors Container -->
+            <div id="factorsContainer">
+                <!-- Factor cards will be inserted here by JavaScript -->
+            </div>
+        </div>
+
+        <!-- Right Container: Supporting Precedents -->
+        <div class="form-container" style="margin: 0;">
+            <!-- Header -->
+            <div style="display: flex; align-items: center; gap: 10px; margin-bottom: 8px;">
+                <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#9ca3af" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                    <path d="m16 16 3-8 3 8c-.87.65-1.92 1-3 1s-2.13-.35-3-1Z"></path>
+                    <path d="m2 16 3-8 3 8c-.87.65-1.92 1-3 1s-2.13-.35-3-1Z"></path>
+                    <path d="M7 21h10"></path>
+                    <path d="M12 3v18"></path>
+                    <path d="M3 7h2c2 0 5-1 7-2 2 1 5 2 7 2h2"></path>
+                </svg>
+                <h2 style="margin: 0; font-size: 24px; color: #1f2937;">Supporting Precedents</h2>
+            </div>
+            
+            <p style="color: #6b7280; font-size: 14px; margin: 0 0 24px 0;">Relevant case law influencing this prediction</p>
+            
+            <!-- Precedent Cards Container -->
+            <div id="precedentsContainer">
+                <!-- Cards will be inserted here by JavaScript -->
+            </div>
+        </div>
+
+    </div>
+
 </div>
 
 <script>
@@ -235,6 +391,12 @@ function updateDisplay() {
     document.getElementById('duration').textContent = prediction.duration;
     document.getElementById('estimatedCosts').textContent = prediction.estimated_costs;
     
+    // Update timeline values
+    document.getElementById('discoveryTimeline').textContent = prediction.discovery_timeline;
+    document.getElementById('mediationTimeline').textContent = prediction.mediation_timeline;
+    document.getElementById('trialTimeline').textContent = prediction.duration;
+    document.getElementById('totalDuration').textContent = prediction.duration;
+    
     // Update risk badge
     const riskBadge = document.getElementById('riskBadge');
     riskBadge.textContent = prediction.risk_tag;
@@ -252,6 +414,149 @@ function updateDisplay() {
         riskBadge.style.background = '#fef3c7';
         riskBadge.style.color = '#92400e';
         riskBadge.style.border = '1px solid #fcd34d';
+    }
+
+    // Update Supporting Precedents
+    const precedentsContainer = document.getElementById('precedentsContainer');
+    if (prediction.precedents && prediction.precedents.length > 0) {
+        let precedentsHTML = '';
+        
+        prediction.precedents.forEach((precedent, index) => {
+            // Determine outcome badge color
+            let badgeColor = '#dcfce7'; // green for favorable outcomes
+            if (precedent.outcome.includes('Defendant') || precedent.outcome === 'Dismissed') {
+                badgeColor = '#fee2e2'; // red for unfavorable
+            } else if (precedent.outcome === 'Settled' || precedent.outcome.includes('Partially')) {
+                badgeColor = '#fef3c7'; // yellow for partial/settled
+            }
+            
+            precedentsHTML += `
+                <div style="background: white; border: 1px solid #e5e7eb; border-radius: 12px; padding: 20px; margin-bottom: 16px;">
+                    <!-- Header with case name and similarity score -->
+                    <div style="display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 12px;">
+                        <h4 style="margin: 0; font-size: 16px; font-weight: 600; color: #111827; flex: 1;">${precedent.case_name}</h4>
+                        <div style="text-align: right; margin-left: 16px;">
+                            <div style="font-size: 18px; font-weight: 700; color: #2563eb;">${precedent.similarity}%</div>
+                            <div style="font-size: 11px; color: #6b7280; margin-top: 2px;">Similarity</div>
+                            <div style="font-size: 14px; font-weight: 600; color: #374151; margin-top: 6px;">${precedent.weight}%</div>
+                            <div style="font-size: 11px; color: #6b7280; margin-top: 2px;">Weight</div>
+                        </div>
+                    </div>
+                    
+                    <!-- Court and Year info -->
+                    <div style="display: flex; gap: 20px; margin-bottom: 12px;">
+                        <div style="display: flex; align-items: center; gap: 6px; color: #6b7280; font-size: 14px;">
+                            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                <path d="M3 21h18M6 18V10M10 18V10M14 18V10M18 18V10M12 2L3 7h18L12 2z"/>
+                            </svg>
+                            <span>${precedent.court}</span>
+                        </div>
+                        <div style="display: flex; align-items: center; gap: 6px; color: #6b7280; font-size: 14px;">
+                            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                <rect x="3" y="4" width="18" height="18" rx="2" ry="2"/>
+                                <line x1="16" y1="2" x2="16" y2="6"/>
+                                <line x1="8" y1="2" x2="8" y2="6"/>
+                                <line x1="3" y1="10" x2="21" y2="10"/>
+                            </svg>
+                            <span>${precedent.year}</span>
+                        </div>
+                    </div>
+                    
+                    <!-- Outcome Badge -->
+                    <div style="display: flex; gap: 12px; align-items: center; margin-bottom: 12px;">
+                        <div style="background: ${badgeColor}; color: ${badgeColor === '#dcfce7' ? '#166534' : badgeColor === '#fee2e2' ? '#991b1b' : '#92400e'}; padding: 4px 12px; border-radius: 12px; font-size: 13px; font-weight: 500;">
+                            ${precedent.outcome}
+                        </div>
+                    </div>
+                    
+                    <!-- Description -->
+                    <p style="margin: 0; color: #6b7280; font-size: 14px; line-height: 1.6;">
+                        ${precedent.description}
+                    </p>
+                </div>
+            `;
+        });
+        
+        precedentsContainer.innerHTML = precedentsHTML;
+    } else {
+        precedentsContainer.innerHTML = '<p style="text-align: center; color: #9ca3af; padding: 40px 20px;">No precedents found for this case.</p>';
+    }
+    
+    // Update Key Factors (Why This Prediction)
+    const factorsContainer = document.getElementById('factorsContainer');
+    if (prediction.key_factors && prediction.key_factors.length > 0) {
+        let factorsHTML = '';
+        
+        prediction.key_factors.forEach((factor, index) => {
+            const factorId = `factor-${currentMode}-${index}`;
+            const isPositive = factor.impact_type === 'Positive';
+            const impactColor = isPositive ? '#dbeafe' : '#fef3c7';
+            const impactTextColor = isPositive ? '#1e40af' : '#92400e';
+            const impactBorder = isPositive ? '#bfdbfe' : '#fde68a';
+            const scoreColor = factor.impact_score >= 0 ? '#10b981' : '#ef4444';
+            const scoreSign = factor.impact_score >= 0 ? '+' : '';
+            
+            factorsHTML += `
+                <div style="background: #f9fafb; border: 1px solid #e5e7eb; border-radius: 12px; margin-bottom: 12px; overflow: hidden;">
+                    <!-- Card Header (Always Visible) -->
+                    <div onclick="toggleFactor('${factorId}')" style="padding: 16px; cursor: pointer; display: flex; justify-content: space-between; align-items: center;">
+                        <div style="display: flex; align-items: center; gap: 12px; flex: 1;">
+                            <!-- Impact Badge -->
+                            <span style="background: ${impactColor}; color: ${impactTextColor}; border: 1px solid ${impactBorder}; padding: 4px 12px; border-radius: 12px; font-size: 13px; font-weight: 500;">
+                                ${factor.impact_type}
+                            </span>
+                            <!-- Factor Name -->
+                            <span style="font-weight: 600; color: #1f2937; font-size: 15px;">${factor.factor_name}</span>
+                            <!-- Category Tag -->
+                            <span style="background: #e5e7eb; color: #6b7280; padding: 4px 10px; border-radius: 8px; font-size: 12px; font-weight: 500;">
+                                ${factor.category}
+                            </span>
+                        </div>
+                        <div style="display: flex; align-items: center; gap: 12px; margin-left: 16px;">
+                            <!-- Impact Score -->
+                            <div style="text-align: right;">
+                                <div style="font-size: 20px; font-weight: 700; color: ${scoreColor};">
+                                    ${scoreSign}${factor.impact_score}
+                                </div>
+                            </div>
+                            <!-- Expand/Collapse Arrow -->
+                            <svg id="${factorId}-arrow" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#9ca3af" stroke-width="2" style="transition: transform 0.2s;">
+                                <path d="M6 9l6 6 6-6"></path>
+                            </svg>
+                        </div>
+                    </div>
+                    
+                    <!-- Card Body (Expandable) -->
+                    <div id="${factorId}" style="max-height: 0; overflow: hidden; transition: max-height 0.3s ease;">
+                        <div style="padding: 0 16px 16px 16px; border-top: 1px solid #e5e7eb;">
+                            <p style="margin: 12px 0 0 0; color: #4b5563; font-size: 14px; line-height: 1.6;">
+                                ${factor.description}
+                            </p>
+                        </div>
+                    </div>
+                </div>
+            `;
+        });
+        
+        factorsContainer.innerHTML = factorsHTML;
+    } else {
+        factorsContainer.innerHTML = '<p style="text-align: center; color: #9ca3af; padding: 40px 20px;">No factors analysis available.</p>';
+    }
+}
+
+// Toggle factor card expansion
+function toggleFactor(factorId) {
+    const factorBody = document.getElementById(factorId);
+    const arrow = document.getElementById(factorId + '-arrow');
+    
+    if (factorBody.style.maxHeight === '0px' || factorBody.style.maxHeight === '') {
+        // Expand
+        factorBody.style.maxHeight = factorBody.scrollHeight + 'px';
+        arrow.style.transform = 'rotate(180deg)';
+    } else {
+        // Collapse
+        factorBody.style.maxHeight = '0px';
+        arrow.style.transform = 'rotate(0deg)';
     }
 }
 
