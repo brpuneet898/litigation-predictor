@@ -44,8 +44,16 @@ body {
     font-weight: 600;
 }
 
-.primary-btn:hover {
+.primary-btn:hover:not(:disabled) {
     background: #1e4fd8;
+}
+
+.primary-btn:disabled {
+    cursor: not-allowed;
+}
+
+.secondary-btn:disabled {
+    cursor: not-allowed;
 }
 
 /* Search */
@@ -190,8 +198,12 @@ body {
     display: inline-block;
 }
 
-.secondary-btn:hover {
+.secondary-btn:hover:not(:disabled) {
     background: #e5e7eb;
+}
+
+.secondary-btn:disabled {
+    cursor: not-allowed;
 }
 
 .form-container {
@@ -199,7 +211,7 @@ body {
     border-radius: 12px;
     border: 1px solid #e5e7eb;
     padding: 32px 32px;
-    max-width: 960px;
+    max-width: 1150px;
     margin: 0 auto;
 }
 
