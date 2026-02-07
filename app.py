@@ -231,6 +231,16 @@ Provide your prediction in EXACTLY this JSON structure with ALL THREE models:
         "description": "<one sentence explanation of how this factor affects the case>"
       }}
     ]
+    "strategic_recommendations": [
+        {{
+            "title": "...",
+            "priority": "High",
+            "category": "Evidence",
+            "rationale": "...",
+            "action_steps": ["...", "..."],
+            "suggested_settlement_range": "₹... - ₹..."
+        }}
+    ]
   }},
   "aggressive": {{
     "win_probability": <number between 0-100>,
@@ -249,6 +259,16 @@ Provide your prediction in EXACTLY this JSON structure with ALL THREE models:
         "description": "<one sentence explanation of how this factor affects the case>"
       }}
     ]
+    "strategic_recommendations": [
+        {{
+            "title": "...",
+            "priority": "High",
+            "category": "Evidence",
+            "rationale": "...",
+            "action_steps": ["...", "..."],
+            "suggested_settlement_range": "₹... - ₹..."
+        }}
+    ]
   }},
   "conservative": {{
     "win_probability": <number between 0-100>,
@@ -266,6 +286,16 @@ Provide your prediction in EXACTLY this JSON structure with ALL THREE models:
         "impact_score": <number between -20 and +20>,
         "description": "<one sentence explanation of how this factor affects the case>"
       }}
+    ]
+    "strategic_recommendations": [
+        {{
+            "title": "...",
+            "priority": "High",
+            "category": "Evidence",
+            "rationale": "...",
+            "action_steps": ["...", "..."],
+            "suggested_settlement_range": "₹... - ₹..."
+        }}
     ]
   }}
 }}
@@ -335,7 +365,16 @@ Guidelines for each field:
   - IMPORTANT: Generate factors based on the ACTUAL case details provided - reference specific evidence, jurisdiction, legal issues, etc.
   - Distribute categories appropriately - don't use same category for all 5 factors
   - Mix positive and negative factors for balanced analysis (typically 3-4 positive, 1-2 negative OR vice versa depending on case strength)
-
+- **strategic_recommendations**: Array of 4–5 highly actionable recommendations for improving chances of success and reducing risk/cost
+  - Each recommendation MUST include:
+    - **title**: Short, strong action phrase (e.g., "Strengthen Documentary Evidence")
+    - **priority**: "High", "Medium", or "Low"
+    - **category**: Must be one of ["Settlement", "Evidence", "Alignment", "Negotiation", "Procedure"]
+    - **rationale**: ONE sentence, case-specific reason
+    - **action_steps**: 2–4 concrete, executable steps
+    - **suggested_settlement_range**: OPTIONAL. Include ONLY if settlement is recommended. Must be in ₹ format (e.g., "₹2,00,000 – ₹3,50,000")
+  - Recommendations MUST be tailored to the actual case facts and documents.
+  
 Return ONLY the JSON object with all three models. No additional text or explanations."""
 
 
@@ -795,7 +834,7 @@ def call_llm(prompt, context=""):
             model="llama-3.3-70b-versatile",
             messages=messages,
             temperature=0.1,
-            max_tokens=2000
+            max_tokens=4000
         )
         
         return response.choices[0].message.content
@@ -1041,6 +1080,11 @@ Key Legal Issues: {case_data['key_legal_issues']}
             response_text = response_text.split('```')[1].split('```')[0]
         
         predictions = json.loads(response_text.strip())
+
+        for model in ['balanced', 'aggressive', 'conservative']:
+            if model in predictions:
+                predictions[model].setdefault('key_factors', [])
+                predictions[model].setdefault('strategic_recommendations', [])
         
         # Print all predictions to terminal
         print("\n" + "="*80)
@@ -1069,7 +1113,9 @@ Key Legal Issues: {case_data['key_legal_issues']}
             "mediation_timeline": "8-10 months",
             "duration": "1-2 years",
             "estimated_costs": "₹1,00,000 - ₹3,00,000",
-            "risk_tag": "Medium Risk"
+            "risk_tag": "Medium Risk",
+            "key_factors": [],
+            "strategic_recommendations": []
         }
         
         if 'balanced' not in predictions:
@@ -1082,7 +1128,9 @@ Key Legal Issues: {case_data['key_legal_issues']}
                 "mediation_timeline": "5-7 months",
                 "duration": "6-12 months",
                 "estimated_costs": "₹75,000 - ₹2,00,000",
-                "risk_tag": "Low Risk"
+                "risk_tag": "Low Risk",
+                "key_factors": [],
+                "strategic_recommendations": []
             }
         if 'conservative' not in predictions:
             predictions['conservative'] = {
@@ -1092,7 +1140,9 @@ Key Legal Issues: {case_data['key_legal_issues']}
                 "mediation_timeline": "10-14 months",
                 "duration": "1.5-3 years",
                 "estimated_costs": "₹1,50,000 - ₹4,50,000",
-                "risk_tag": "High Risk"
+                "risk_tag": "High Risk",
+                "key_factors": [],
+                "strategic_recommendations": []
             }
         
         # Store all predictions
@@ -1122,7 +1172,9 @@ Key Legal Issues: {case_data['key_legal_issues']}
                 "mediation_timeline": "8-10 months",
                 "duration": "1-2 years",
                 "estimated_costs": "₹1,00,000 - ₹3,00,000",
-                "risk_tag": "Medium Risk"
+                "risk_tag": "Medium Risk",
+                "key_factors": [],
+                "strategic_recommendations": []
             },
             "aggressive": {
                 "win_probability": 70,
@@ -1131,7 +1183,9 @@ Key Legal Issues: {case_data['key_legal_issues']}
                 "mediation_timeline": "5-7 months",
                 "duration": "6-12 months",
                 "estimated_costs": "₹75,000 - ₹2,00,000",
-                "risk_tag": "Low Risk"
+                "risk_tag": "Low Risk",
+                "key_factors": [],
+                "strategic_recommendations": []
             },
             "conservative": {
                 "win_probability": 35,
@@ -1140,7 +1194,9 @@ Key Legal Issues: {case_data['key_legal_issues']}
                 "mediation_timeline": "10-14 months",
                 "duration": "1.5-3 years",
                 "estimated_costs": "₹1,50,000 - ₹4,50,000",
-                "risk_tag": "High Risk"
+                "risk_tag": "High Risk",
+                "key_factors": [],
+                "strategic_recommendations": []
             }
         }
     
