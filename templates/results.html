@@ -44,7 +44,7 @@
                 </svg>
                 Share
             </button>
-            <button class="primary-btn" title="Export as PDF" style="padding: 12px 16px; font-size: 16px; display: flex; align-items: center; gap: 8px;">
+            <button id="exportPdfBtn" class="primary-btn" title="Export as PDF" style="padding: 12px 16px; font-size: 16px; display: flex; align-items: center; gap: 8px;">
                 <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
                     <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path>
                     <polyline points="7 10 12 15 17 10"></polyline>
@@ -634,6 +634,68 @@ function toggleFactor(factorId) {
 document.addEventListener('DOMContentLoaded', function() {
     updateDisplay();
 });
+</script>
+<script src="https://cdn.jsdelivr.net/npm/html2canvas@1.4.1/dist/html2canvas.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/jspdf@2.5.1/dist/jspdf.umd.min.js"></script>
+<script>
+  async function exportResultsToPDF() {
+    const btn = document.getElementById("exportPdfBtn");
+    const exportTarget = document.querySelector(".container"); // wraps the whole page content :contentReference[oaicite:1]{index=1}
+    if (!exportTarget) return;
+
+    // Optional: disable button while exporting
+    btn.disabled = true;
+    const oldText = btn.innerText;
+    btn.innerText = "Exporting...";
+
+    // Hide header buttons in PDF (optional but recommended)
+    const header = document.querySelector(".header");
+    const oldHeaderDisplay = header ? header.style.display : "";
+    if (header) header.style.display = "none";
+
+    try {
+      const canvas = await html2canvas(exportTarget, {
+        scale: 2,          // sharper PDF
+        useCORS: true,     // if you ever load images/icons from elsewhere
+        backgroundColor: "#f7f9fc" // matches your body background :contentReference[oaicite:2]{index=2}
+      });
+
+      const imgData = canvas.toDataURL("image/png");
+      const { jsPDF } = window.jspdf;
+
+      // A4 portrait
+      const pdf = new jsPDF("p", "mm", "a4");
+      const pageWidth = pdf.internal.pageSize.getWidth();
+      const pageHeight = pdf.internal.pageSize.getHeight();
+
+      // Convert canvas px -> mm scaling
+      const imgWidth = pageWidth;
+      const imgHeight = (canvas.height * imgWidth) / canvas.width;
+
+      let position = 0;
+      pdf.addImage(imgData, "PNG", 0, position, imgWidth, imgHeight);
+
+      // Add extra pages if content spills
+      let heightLeft = imgHeight - pageHeight;
+      while (heightLeft > 0) {
+        pdf.addPage();
+        position = - (imgHeight - heightLeft);
+        pdf.addImage(imgData, "PNG", 0, position, imgWidth, imgHeight);
+        heightLeft -= pageHeight;
+      }
+
+      // Filename (customize as you like)
+      const title = "{{ case_data.case_title }}".replace(/[^\w\s-]/g, "").trim() || "case-results";
+      pdf.save(`${title}-results.pdf`);
+    } finally {
+      // Restore UI
+      if (header) header.style.display = oldHeaderDisplay;
+      btn.disabled = false;
+      btn.innerText = oldText;
+    }
+  }
+
+  document.getElementById("exportPdfBtn")?.addEventListener("click", exportResultsToPDF);
 </script>
 
 </body>

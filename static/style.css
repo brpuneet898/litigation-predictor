@@ -631,6 +631,12 @@ body {
     }
 }
 
+/* Hide header controls during export/print if you later switch to print-based export */
+@media print {
+  .header { display: none !important; }
+  body { background: white !important; }
+}
+
 .recommendation-card { border-radius: 12px; padding: 16px; margin-bottom: 12px; border: 1px solid #e5e7eb; }
 .recommendation-tags { display: flex; gap: 8px; flex-wrap: wrap; justify-content: flex-end; }
 .recommendation-pill { padding: 4px 10px; border-radius: 999px; font-size: 12px; font-weight: 600; border: 1px solid #e5e7eb; background: #fff; color: #6b7280; }
